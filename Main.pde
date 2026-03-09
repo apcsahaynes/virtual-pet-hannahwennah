@@ -1,63 +1,68 @@
-VirtualPet myPet;
-
+// global variables
+Button cleanButton;
 Button feedButton;
 Button playButton;
 
-// How many milliseconds between each status update
-// (increase to slow down, decrease to speed up)
-final int UPDATE_INTERVAL = 10000;
+Food apple;
+Game fetch;
+Pet bunny;
+
+final int UPDATE_INTERVAL = 30000; // in milliseconds
 int lastUpdateTime = 0;
 
-// ---- Action message ----
-String actionMessage = "";
+String message;
+final int MESSAGE_DURATION = 5000; // in millseconds
 int messageTime = 0;
-final int MESSAGE_DURATION = 2000; // milliseconds to show the message
 
 void setup() {
-  size(600, 500);
-  textFont(createFont("Arial", 16, true));
-
-  myPet = new VirtualPet4("Coco");
-
-  // Buttons sit along the bottom of the screen
-  // Button(label, x, y, width, height)
-  feedButton = new Button("Feed", 150, 430, 120, 45);
-  playButton = new Button("Play", 330, 430, 120, 45);
+  size(680, 380);
+  noStroke();
+ 
+  cleanButton = new Button("clean", 80, 60, 280);
+  feedButton = new Button("feed", 80, 160, 280);
+  playButton = new Button("play", 80, 260, 280);
+ 
+  apple = new Food("apple", 1, 2, 1);
+  fetch = new Game("fetch", 1, 2);
+  bunny = new Pet("snow white");
+  
+  message = bunny.getName() + " is waiting . . .";
 }
 
 void draw() {
-  background(245, 240, 255);
+  background(255);
 
-  // ---- Timed status update ----
   if (millis() - lastUpdateTime >= UPDATE_INTERVAL) {
-    myPet.updateStatus();
+    bunny.update();
     lastUpdateTime = millis();
   }
 
-  // ---- Draw sections ----
-  drawPetArea();
-  drawStats(myPet);
+  drawPet();
+  displayStats(bunny);
+  cleanButton.display();
   feedButton.display();
   playButton.display();
-  drawMessage();
+  displayMessage();
 }
 
 void mousePressed() {
-  if (feedButton.isClicked(mouseX, mouseY)) {
-    Food f = new Food("Watermelon", 3, 2, 2);
-    myPet.feed(f);
-    showMessage(f.getName() + " eaten!");
+  if (cleanButton.isClicked(mouseX, mouseY)) {
+    bunny.clean();
+    changeMessage(bunny.getName() + " was cleaned !");
   }
-
+  
+  if (feedButton.isClicked(mouseX, mouseY)) {
+    bunny.feed(apple);
+    changeMessage(bunny.getName() + " ate an apple !");
+  }
+  
   if (playButton.isClicked(mouseX, mouseY)) {
-    Game g = new Game("Coin Toss", 2, 1);
-    myPet.play(g);
-    showMessage(g.getName() + " played!");
+    bunny.play(fetch);
+    changeMessage(bunny.getName() + " played fetch !");
   }
 }
 
-// Call this to set a new message
-void showMessage(String msg) {
-  actionMessage = msg;
+void changeMessage(String msg) {
+  message = msg;
   messageTime = millis();
 }
